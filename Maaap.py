@@ -2,7 +2,7 @@ from curses import window
 from distutils.command.config import config
 import tkinter as tk
 from turtle import onclick
-from PIL import Image, ImageTK
+from PIL import Image, ImageTk
 from urllib.request import urlopen
 from io import BytesIO
 import json
