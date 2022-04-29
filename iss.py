@@ -4,18 +4,31 @@ from PIL import Image, ImageTk
 from urllib.request import urlopen
 from io import BytesIO
 import json
-from setuptools import setup
 import config as cfg
+
+def get_image(url:str):
+    pic = urlopen(url)
+    raw_data = pic.read()
+    pic.close()
+
+raw_image = Image.open(BytesIO(raw_data))
+photo = ImageTk.PhotoImage(raw_image)
+
+display_map.configure(text='--||--',compound=tk.CENTER,image=photo)
+display_map.image = photo
+display_map.grid(row=0, column=0)
+
+print('Map updated...')
+
 
 def get_iss_location(url:str):
     try:
         iss_request = urlopen(url)
-        iss_location = json.loads(iss_request.read)
+        iss_location = json.loads(iss_request.read())
 
-        print(iss_location)
 
-        longitude = iss_location['iss_postition']['longitude']
-        latitude = iss_location['iss_postition']['latitude']
+        longitude = iss_location['iss_position']['longitude']
+        latitude = iss_location['iss_position']['latitude']
 
         return longitude, latitude
     except Exception as e:
@@ -26,17 +39,22 @@ def get_iss_location(url:str):
 
 
 def refresh(x):
-    pass
+    # Using the api to find locatioo of ISS
+    longitude, latitude = get_iss_location('http://api.open-notify.org/iss-now.json')
+    print('Location obtained...')
+
+    print('Getting map...')
+    sat_pic_url="https://api.tomtom.com/map/1/staticimage?layer=basic&style=main&format=png&zoom=02&center="+ str(longitude) +"%2cC"+ str(latitude) + "&width=512&height=512&view=Unified&key=" + cfg.TOMTOM_API_KEY
+    get_image(sat_pic_url)
 
 #Window setup
-root= tk.TK()
+root= tk.Tk()
 root.title("Map program - International space station Location")
-root.geometry('600x600')
 
 display_map = tk.Label(root,font=('Arial 18 bold'),fg='red')
-display_map.bind('<Buttion',refresh)
-display_map.grid(row=0, column=0)
+display_map.bind('<Button>',refresh)
 
-longitude, latitude = get_iss_location('https://api.open-notify.org/iss-now.json')
+
+refresh(1)
 
 root.mainloop()
