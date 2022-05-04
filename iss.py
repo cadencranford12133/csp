@@ -8,7 +8,7 @@ import config as cfg
 
 def get_image(url:str):
     pic = urlopen(url)
-    raw_data = pic.read()
+    raw_d = pic.read()
     pic.close()
 
 raw_image = Image.open(BytesIO(raw_data))
